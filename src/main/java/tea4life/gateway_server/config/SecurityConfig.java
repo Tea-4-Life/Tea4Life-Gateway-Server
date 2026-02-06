@@ -15,6 +15,19 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/actuator/**").permitAll()
+
+                        // User Service
+                        .pathMatchers("/user-service/public/**").permitAll()
+                        .pathMatchers("/user-service/").authenticated()
+
+                        // Storage Service
+                        .pathMatchers("/storage-service/public/**").permitAll()
+                        .pathMatchers("/storage-service/**").authenticated()
+
+                        // Product Service
+                        .pathMatchers("/product-service/public/**").permitAll()
+                        .pathMatchers("/product-service/**").authenticated()
+
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
