@@ -23,10 +23,14 @@ public class UserHeaderFilter implements GlobalFilter {
                 .cast(JwtAuthenticationToken.class)
                 .map(jwtAuth -> {
                     String userId = jwtAuth.getToken().getSubject();
+                    String email = jwtAuth.getToken().getClaim("email");
 
                     ServerHttpRequest request = exchange.getRequest().mutate()
-                            .header("X-User-Id", userId)
+                            .header("X-User-KeycloakId", userId)
+                            .header("X-User-Email", email)
                             .build();
+
+
                     return exchange.mutate().request(request).build();
                 })
                 .defaultIfEmpty(exchange)
