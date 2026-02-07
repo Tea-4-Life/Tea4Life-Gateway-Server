@@ -18,7 +18,7 @@ public class SecurityConfig {
 
                         // User Service
                         .pathMatchers("/user-service/public/**").permitAll()
-                        .pathMatchers("/user-service/").authenticated()
+                        .pathMatchers("/user-service/**").authenticated()
 
                         // Storage Service
                         .pathMatchers("/storage-service/public/**").permitAll()
