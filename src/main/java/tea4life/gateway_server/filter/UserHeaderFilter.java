@@ -3,9 +3,9 @@ package tea4life.gateway_server.filter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -26,11 +26,14 @@ public class UserHeaderFilter implements GlobalFilter {
      * ========================================
      */
 
-    @Lazy
-    private final UserInternalClient userInternalClient;
+    private final ObjectProvider<@NonNull UserInternalClient> userInternalClientProvider;
 
+    @NullMarked
     @Override
-    public Mono<@NonNull Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    public Mono<Void> filter(
+            ServerWebExchange exchange,
+            GatewayFilterChain chain
+    ) {
         return exchange.getPrincipal()
                 .filter(p -> p instanceof JwtAuthenticationToken)
                 .cast(JwtAuthenticationToken.class)
@@ -38,7 +41,6 @@ public class UserHeaderFilter implements GlobalFilter {
                     String userId = jwtAuth.getToken().getSubject();
                     String email = jwtAuth.getToken().getClaim("email");
 
-                    // Chuyển đổi từ Blocking call sang Reactive stream
                     return fetchUserAuthorities(userId)
                             .map(authorities -> {
                                 ServerHttpRequest mutatedRequest =
@@ -51,13 +53,17 @@ public class UserHeaderFilter implements GlobalFilter {
     }
 
     /**
-     * Hàm lấy quyền hạn từ User Service (Xử lý Blocking)
+     * Hàm lấy quyền hạn từ User Service thông qua Feign Client.
+     * Sử dụng Schedulers.boundedElastic() vì Feign là Blocking call trong môi trường Reactive.
      */
     private Mono<@NonNull String> fetchUserAuthorities(String userId) {
-        return Mono.fromCallable(() -> userInternalClient.getUserPermissions(userId))
+        return Mono.fromCallable(() -> {
+                    UserInternalClient client = userInternalClientProvider.getIfAvailable();
+                    return (client != null) ? client.getUserPermissions(userId) : null;
+                })
                 .subscribeOn(Schedulers.boundedElastic())
                 .map(response -> {
-                    if (response != null && response.getData() != null) {
+                    if (response.getData() != null) {
                         return String.join(",", response.getData().permissions());
                     }
                     return "";
@@ -66,7 +72,7 @@ public class UserHeaderFilter implements GlobalFilter {
     }
 
     /**
-     * Hàm cập nhật Header cho Request
+     * Tạo request mới với các header định danh người dùng
      */
     private ServerHttpRequest mutateRequest(
             ServerWebExchange exchange, String userId,
