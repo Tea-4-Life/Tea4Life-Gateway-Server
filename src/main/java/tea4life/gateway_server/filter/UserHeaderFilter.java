@@ -40,7 +40,7 @@ public class UserHeaderFilter implements GlobalFilter {
                 .flatMap(jwtAuth -> {
                     String userId = jwtAuth.getToken().getSubject();
                     String email = jwtAuth.getToken().getClaim("email");
-
+                    
                     return fetchUserAuthorities(userId)
                             .map(authorities -> {
                                 ServerHttpRequest mutatedRequest =
