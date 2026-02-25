@@ -28,6 +28,7 @@ public class SecurityConfig {
 
                         // Product Service
                         .pathMatchers("/product-service/public/**").permitAll()
+                        .pathMatchers("/user-service/internal/**").denyAll()
                         .pathMatchers("/product-service/**").authenticated()
 
                         .anyExchange().authenticated()
