@@ -23,6 +23,9 @@ public class GatewayServerApplication {
     @Value("${service.url.product}")
     private String productServiceUrl;
 
+    @Value("${service.url.workflow}")
+    private String workflowServiceUrl;
+
     public static void main(String[] args) {
         SpringApplication.run(GatewayServerApplication.class, args);
     }
@@ -56,6 +59,15 @@ public class GatewayServerApplication {
                                 f.rewritePath("/product-service/(?<segment>.*)", "/${segment}")
                         )
                         .uri(productServiceUrl)
+                )
+
+                // Workflow Service
+                .route("workflow-service-route", r -> r
+                        .path("/workflow-service/**")
+                        .filters(f ->
+                                f.rewritePath("/workflow-service/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri(workflowServiceUrl)
                 )
 
                 .build();
