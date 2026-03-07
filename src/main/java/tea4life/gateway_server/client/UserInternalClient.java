@@ -10,7 +10,11 @@ import tea4life.gateway_server.dto.UserPermissionsResponse;
  * Admin 2/20/2026
  *
  **/
-@FeignClient(name = "TEA4LIFE-USER-SERVICE", path = "/internal/users")
+@FeignClient(
+        name = "TEA4LIFE-USER-SERVICE",
+        url = "${service.url.user}",
+        path = "/internal/users"
+)
 public interface UserInternalClient {
 
     @GetMapping("/{keycloakId}/permissions")

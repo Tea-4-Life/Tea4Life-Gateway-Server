@@ -1,5 +1,6 @@
 package tea4life.gateway_server;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -12,6 +13,15 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 @EnableWebFluxSecurity
 @EnableFeignClients
 public class GatewayServerApplication {
+
+    @Value("${service.url.storage}")
+    private String storageServiceUrl;
+
+    @Value("${service.url.user}")
+    private String userServiceUrl;
+
+    @Value("${service.url.product}")
+    private String productServiceUrl;
 
     public static void main(String[] args) {
         SpringApplication.run(GatewayServerApplication.class, args);
@@ -27,7 +37,7 @@ public class GatewayServerApplication {
                         .filters(f ->
                                 f.rewritePath("/storage-service/(?<segment>.*)", "/${segment}")
                         )
-                        .uri("lb://TEA4LIFE-STORAGE-SERVICE")
+                        .uri(storageServiceUrl)
                 )
 
                 // User Service
@@ -36,7 +46,7 @@ public class GatewayServerApplication {
                         .filters(f ->
                                 f.rewritePath("/user-service/(?<segment>.*)", "/${segment}")
                         )
-                        .uri("lb://TEA4LIFE-USER-SERVICE")
+                        .uri(userServiceUrl)
                 )
 
                 // Product Service
@@ -45,11 +55,9 @@ public class GatewayServerApplication {
                         .filters(f ->
                                 f.rewritePath("/product-service/(?<segment>.*)", "/${segment}")
                         )
-                        .uri("lb://TEA4LIFE-PRODUCT-SERVICE")
+                        .uri(productServiceUrl)
                 )
 
                 .build();
     }
-
-
 }
