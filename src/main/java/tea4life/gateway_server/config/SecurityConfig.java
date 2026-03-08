@@ -24,11 +24,12 @@ public class SecurityConfig {
 
                         // Storage Service
                         .pathMatchers("/storage-service/public/**").permitAll()
+                        .pathMatchers("/storage-service/internal/**").denyAll()
                         .pathMatchers("/storage-service/**").authenticated()
 
                         // Product Service
                         .pathMatchers("/product-service/public/**").permitAll()
-                        .pathMatchers("/user-service/internal/**").denyAll()
+                        .pathMatchers("/product-service/internal/**").denyAll()
                         .pathMatchers("/product-service/**").authenticated()
 
                         .anyExchange().authenticated()
