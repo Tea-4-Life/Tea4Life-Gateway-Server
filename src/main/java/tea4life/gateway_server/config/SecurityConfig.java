@@ -32,6 +32,11 @@ public class SecurityConfig {
                         .pathMatchers("/product-service/internal/**").denyAll()
                         .pathMatchers("/product-service/**").authenticated()
 
+                        // Order Service
+                        .pathMatchers("/order-service/public/**").permitAll()
+                        .pathMatchers("/order-service/internal/**").denyAll()
+                        .pathMatchers("/order-service/**").authenticated()
+
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
