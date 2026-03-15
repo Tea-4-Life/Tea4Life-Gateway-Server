@@ -32,6 +32,11 @@ public class SecurityConfig {
                         .pathMatchers("/product-service/internal/**").denyAll()
                         .pathMatchers("/product-service/**").authenticated()
 
+                        // Recommendation Service
+                        .pathMatchers("/recommendation-service/public/**").permitAll()
+                        .pathMatchers("/recommendation-service/internal/**").denyAll()
+                        .pathMatchers("/recommendation-service/**").authenticated()
+
                         // Order Service
                         .pathMatchers("/order-service/public/**").permitAll()
                         .pathMatchers("/order-service/internal/**").denyAll()
