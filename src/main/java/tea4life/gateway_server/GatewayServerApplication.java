@@ -26,6 +26,9 @@ public class GatewayServerApplication {
     @Value("${service.url.order}")
     private String orderServiceUrl;
 
+    @Value("${service.url.logistics}")
+    private String logisticsServiceUrl;
+
     @Value("${service.url.workflow}")
     private String workflowServiceUrl;
 
@@ -71,6 +74,15 @@ public class GatewayServerApplication {
                                 f.rewritePath("/order-service/(?<segment>.*)", "/${segment}")
                         )
                         .uri(orderServiceUrl)
+                )
+
+                // Logistics Service
+                .route("logistics-service-route", r -> r
+                        .path("/logistics-service/**")
+                        .filters(f ->
+                                f.rewritePath("/logistics-service/(?<segment>.*)", "/${segment}")
+                        )
+                        .uri(logisticsServiceUrl)
                 )
 
                 // Workflow Service
